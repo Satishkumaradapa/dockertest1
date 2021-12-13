@@ -4,7 +4,7 @@ pipeline {
 
 	    stage('Clone Repository') {
 		  steps {
-	                sh 'git clone --single-branch --branch master1 https://github.com/Satishkumaradapa/dockertest1.git'
+	                sh 'git clone --single-branch --branch master https://github.com/Satishkumaradapa/dockertest1.git'
 		  }		
 	    }
 
