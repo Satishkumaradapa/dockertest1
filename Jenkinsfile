@@ -1,41 +1,39 @@
 pipeline {
-  environment {
-    imagename = "8074764785/dockertest1"
-    registryCredential = '8074764785'
-    dockerImage = ''
-  }
-  agent any
-  stages {
-    stage('Cloning Git') {
-      steps {
-        git([url: 'https://github.com/Satishkumaradapa/dockertest1.git', branch: 'master'])
+    agent any
+    stages { 
 
-      }
-    }
-    stage('Building image') {
-      steps{
-        script {
-          dockerImage = docker.build imagename
+	    stage('Clone Repository') {
+		  steps {
+	                sh 'git clone --single-branch --branch master1 https://github.com/Satishkumaradapa/dockertest1.git'
+		  }		
+	    }
+
+	    stage('Build Docker Image') {
+		  steps {
+	        sh 'cd /var/lib/jenkins/jobs/pipelinetest/workspace/dockertest1'
+	        sh 'cp -r /var/lib/jenkins/jobs/pipelinetest/workspace/dockertest1/* /var/lib/jenkins/jobs/pipelinetest/workspace'
+	        sh 'docker build -t 8074764785/pipelinetest:v$BUILD_NUMBER .'
+		  }
+	    }
+
+	    stage('Push Image to Docker Hub') {
+		  steps {
+	        sh  'docker push 8074764785/pipelinetest:v$BUILD_NUMBER'
+		  }		
         }
-      }
-    }
-    stage('Deploy Image') {
-      steps{
-        script {
-          docker.withRegistry( '', registryCredential ) {
-            dockerImage.push("$BUILD_NUMBER")
-             dockerImage.push('latest')
 
-          }
-        }
-      }
-    }
-    stage('Remove Unused docker image') {
-      steps{
-        sh "docker rmi $imagename:$BUILD_NUMBER"
-         sh "docker rmi $imagename:latest"
+	    stage('Deploy to Docker Host') {
+		  steps {
+	        sh 'docker run --rm -dit --name dockertest1 --hostname dockertest1 -p 8004:80 8074764785/pipelinetest:v$BUILD_NUMBER'
+	        
+		  }
+		}
 
-      }
+	    stage('Check Webapp Reachability') {
+		  steps {
+	        sh 'sleep 10s'
+	           sh 'curl http://ec2-13-126-164-184.ap-south-1.compute.amazonaws.com:8004'
+		  }
+	    }
     }
-  }
 }
