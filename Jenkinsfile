@@ -1,47 +1,41 @@
 pipeline {
-    environment {
-        registry = '8074764785/dockertest1'
-        registryCredential = '8074764785'
-        dockerhost = '10.1.1.165'
-        dockerImage = ''
+  environment {
+    imagename = "8074764785/dockertest1"
+    registryCredential = '8074764785'
+    dockerImage = ''
+  }
+  agent any
+  stages {
+    stage('Cloning Git') {
+      steps {
+        git([url: 'https://github.com/Satishkumaradapa/dockertest1.git', branch: 'master'])
+
+      }
     }
-    agent any
-    stages {
-        stage('Cloning our Git') {
-            steps {
-                git 'https://github.com/Satishkumaradapa/dockertest1.git'
-            }
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build imagename
         }
-        stage('Building our image') {
-            steps {
-                script {
-                    dockerImage = docker.build registry + ":v$BUILD_NUMBER"
-                }
-            }
-        }
-        stage('Push Image To DockerHUB') {
-            steps {
-                script {
-                    docker.withRegistry( '', registryCredential ) {
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
-        stage('Cleaning up') {
-            steps {
-                sh "docker rmi $registry:v$BUILD_NUMBER"
-            }
-        }
-        stage('dockerhost') {
-            steps {
-                sh "docker service create --name testing1 -p 8100:80 $registry:v$BUILD_NUMBER"
-            }
-        }
-        stage('Verifying The Deployment') {
-            steps {
-                sh 'curl http://$dockerhost:8100 || exit 1'
-                }
-        }
+      }
     }
+    stage('Deploy Image') {
+      steps{
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push("$BUILD_NUMBER")
+             dockerImage.push('latest')
+
+          }
+        }
+      }
+    }
+    stage('Remove Unused docker image') {
+      steps{
+        sh "docker rmi $imagename:$BUILD_NUMBER"
+         sh "docker rmi $imagename:latest"
+
+      }
+    }
+  }
 }
