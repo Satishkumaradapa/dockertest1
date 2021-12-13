@@ -11,8 +11,8 @@ pipeline {
 
 	    stage('Build Docker Image') {
 		  steps {
-	        sh 'sudo -S cd :/var/lib/jenkins/workspace/pipelinetest/dockertest1'
-	        sh 'sudo -S cp -r :/var/lib/jenkins/workspace/pipelinetest/dockertest1/* :/var/lib/jenkins/workspace/pipelinetest'
+	        sh 'sudo -s cd :/var/lib/jenkins/workspace/pipelinetest/dockertest1'
+	        sh 'sudo -s cp -r :/var/lib/jenkins/workspace/pipelinetest/dockertest1/* :/var/lib/jenkins/workspace/pipelinetest'
 	        sh 'docker build -t 8074764785/pipelinetest:v$BUILD_NUMBER .'
 		  }
 	    }
