@@ -25,6 +25,7 @@ pipeline {
 
 	    stage('Deploy to Docker Host') {
 		  steps {
+	        sh 'docker stop 'currentBuild.previousBuild.getNumber'
 	        sh 'docker run --rm -dit --name dockertest1 --hostname dockertest1 -p 8004:80 8074764785/pipelinetest:v$BUILD_NUMBER'
 	        
 		  }
