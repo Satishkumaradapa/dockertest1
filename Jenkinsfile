@@ -4,14 +4,15 @@ pipeline {
 
 	    stage('Clone Repository') {
 		  steps {
+			sh 'rm -rf dockertest1 '
 	                sh 'git clone --single-branch --branch master https://github.com/Satishkumaradapa/dockertest1.git'
 		  }		
 	    }
 
 	    stage('Build Docker Image') {
 		  steps {
-	        sh 'cd /var/lib/jenkins/jobs/pipelinetest/workspace/dockertest1'
-	        sh 'cp -r /var/lib/jenkins/jobs/pipelinetest/workspace/dockertest1/* /var/lib/jenkins/jobs/pipelinetest/workspace'
+	        sh 'cd :/var/lib/jenkins/workspace/pipelinetest/dockertest1'
+	        sh 'cp -r :/var/lib/jenkins/workspace/pipelinetest/dockertest1/* :/var/lib/jenkins/workspace/pipelinetest'
 	        sh 'docker build -t 8074764785/pipelinetest:v$BUILD_NUMBER .'
 		  }
 	    }
