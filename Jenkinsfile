@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages { 
-      try{
+      try {
           emailext body: 'test', subject: 'jenkins', to: 'adapasatishkumar74@gmail.com'
 	      stage('Clone Repository') {
 		    steps {
